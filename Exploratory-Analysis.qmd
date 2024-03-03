@@ -11,7 +11,7 @@ editor: visual
 #| message: false
 
 library(tidyverse)
-library(readxl)
+library(plotly)
 library(sf)
 library(mapview)
 ```
@@ -21,6 +21,8 @@ library(mapview)
 
 # Data
 
+Spatio-temporal data:
+
 ```{r}
 #| warning: false
 #| message: false
@@ -28,5 +30,75 @@ data = read_csv('Data/gedevents-2024-03-03.csv')
 data$source_date <- ymd(data$source_date)
 data$date_start <- ymd_hms(data$date_start)
 data$date_end <- ymd_hms(data$date_end)
+glimpse(data)
 ```
+
+Missing data:
+
+Most violent event:
+
+```{r}
+data %>%
+  filter(best_est == max(best_est))
+```
+
+
+Top 5 most violent sides:
+
+```{r}
+data %>%
+  group_by(side_a) %>%
+  mutate(Total_fatalities = sum(best_est)) %>%
+  reframe(side_a, Total_fatalities) %>%
+  arrange(desc(Total_fatalities)) %>%
+  unique() %>%
+  top_n(5)
+```
+
+Top 5 most affected group
+
+```{r}
+data %>%
+  group_by(side_b) %>%
+  mutate(Total_fatalities = sum(best_est)) %>%
+  reframe(side_b, Total_fatalities) %>%
+  arrange(desc(Total_fatalities)) %>%
+  unique() %>%
+  top_n(5)
+```
+Top 5 most violent side towards civilians:
+
+```{r}
+data %>%
+  group_by(side_a) %>%
+  mutate(Total_fatalities = sum(deaths_civilians)) %>%
+  reframe(side_a, Total_fatalities) %>%
+  arrange(desc(Total_fatalities)) %>%
+  unique() %>%
+  top_n(5)
+```
+
+
+## Temporal Analysis
+
+```{r}
+top5_agressors <- data %>%
+  group_by(side_a) %>%
+  mutate(Total_fatalities = sum(best_est)) %>%
+  reframe(side_a, Total_fatalities) %>%
+  arrange(desc(Total_fatalities)) %>%
+  unique() %>%
+  top_n(5) %>%
+  pull(side_a)
+
+data %>%
+  filter(side_a %in% top5_agressors) %>%
+  ggplot(aes(x = source_date, y = best_est, group = side_a)) +
+  geom_bar(aes(colour = side_a), stat = 'identity') +
+  facet_wrap(~side_a)
+  
+```
+
+
+## Spatial Analysis
 
