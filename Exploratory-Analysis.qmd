@@ -1,0 +1,32 @@
+---
+title: "Uppsala Conflict Data Program: Exploratory Data Analysis"
+author: "Juan Martinez"
+format: html
+editor: visual
+---
+
+```{r}
+#| label: libraries
+#| warning: false
+#| message: false
+
+library(tidyverse)
+library(readxl)
+library(sf)
+library(mapview)
+```
+
+
+# Introduction
+
+# Data
+
+```{r}
+#| warning: false
+#| message: false
+data = read_csv('Data/gedevents-2024-03-03.csv')
+data$source_date <- ymd(data$source_date)
+data$date_start <- ymd_hms(data$date_start)
+data$date_end <- ymd_hms(data$date_end)
+```
+
