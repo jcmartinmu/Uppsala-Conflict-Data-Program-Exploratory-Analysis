@@ -102,3 +102,10 @@ data %>%
 
 ## Spatial Analysis
 
+Convert data-frame to sf object:
+
+```{r}
+data_sf <- st_as_sf(data, coords = c('longitude', 'latitude'), crs = 4326)
+mapview(data_sf, zcol = 'deaths_civilians')
+```
+
